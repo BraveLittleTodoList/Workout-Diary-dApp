@@ -77,7 +77,8 @@
 		"type": "function"
 	}
 ]
-    
+    let WorkoutContract;
+    let signer;
 
     provider.send("eth_requestAccounts", []).then(() => {
       provider.listAccounts().then(function (accounts) {
