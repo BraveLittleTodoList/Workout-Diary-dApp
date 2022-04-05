@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My First dApp</title>
+    <style>
+        body {
+          text-align: center;
+          font-family: Arial, Helvetica, sans-serif;
+        }
+      
+        div {
+          width: 20%;
+          margin: 0 auto;
+          display: flex;
+          flex-direction: column;
+        }
+      
+        button {
+          width: 100%;
+          margin: 10px 0px 5px 0px;
+        }
+      </style>
+</head>
+<body>
+    <body>
+        <div id="div1">
+          <h1>This is my dApp to remember workouts. </h1>
+          <p>you are good at picking things up and putting them down... but not remembering past workouts.</p>
+          <p>Here we can place our current workout</p>
+          <label for="Workout">Input workout:</label> <br />
+          <input type="text" id="Workout" />
+          <button onclick="setWorkout()">Set Workout</button>
+          <button onclick="getWorkout()">Get Workout</button>
+          
+        </div>
+      </body>
+
+      <script
+        src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
+        type="application/javascript">
+      </script>
+
+<script>
+     const provider = new ethers.providers.Web3Provider(
+      window.ethereum,
+      "ropsten"
+    );
+    var WorkoutContractAddress = "0x4864eCd3070F3080C3Bf8Eca5E84AD58995Be09c";
+    var WorkoutContractABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_workout",
+				"type": "string"
+			}
+		],
+		"name": "setWorkout",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getWorkout",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+    let MoodContract;
+    let signer;
+
+    provider.send("eth_requestAccounts", []).then(() => {
+      provider.listAccounts().then(function (accounts) {
+        signer = provider.getSigner(accounts[0]);
+        WorkoutContract = new ethers.Contract(
+          WorkoutContractAddress,
+          WorkoutContractABI,
+          signer
+        );
+      });
+    });
+
+    async function getWorkout() {
+      const getWorkoutPromise = WorkoutContract.getWorkout();
+      const Workout = await getWorkoutPromise;
+      
+      const para = document.createElement("p");
+        let currentWorkout = document.createTextNode(`The Current Workout Is: ${Workout} `);
+        let blockNumber = document.createTextNode(`Block Number Is: ${await provider.getBlockNumber()}`);
+        
+        para.appendChild(currentWorkout);
+        para.appendChild(blockNumber);
+
+        const element = document.getElementById("div1");
+        element.appendChild(para);
+    }
+
+    async function setWorkout() {
+      const Workout = document.getElementById("Workout").value;
+      const setWorkoutPromise = WorkoutContract.setWorkout(Workout);
+      await setWorkoutPromise;
+    }
+</script>
+
+</body>
+</html>
